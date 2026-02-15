@@ -154,7 +154,7 @@ export const listSSOProviders = () => {
 				(p) => p.organizationId !== null && p.organizationId !== undefined,
 			);
 
-			const orgPluginEnabled = ctx.context.hasPlugin("organization");
+			const orgPluginEnabled = !!(ctx.context as any).hasPlugin?.("organization");
 
 			let accessibleProviders: typeof userOwnedProviders = [
 				...userOwnedProviders,
@@ -226,7 +226,7 @@ async function checkProviderAccess(
 
 	let hasAccess = false;
 	if (provider.organizationId) {
-		if (ctx.context.hasPlugin("organization")) {
+		if ((ctx.context as any).hasPlugin?.("organization")) {
 			hasAccess = await isOrgAdmin(ctx, userId, provider.organizationId);
 		} else {
 			hasAccess = provider.userId === userId;
