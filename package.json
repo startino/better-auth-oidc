@@ -8,7 +8,7 @@
   "description": "OIDC-only SSO plugin for Better Auth with no Node.js API dependencies",
   "repository": {
     "type": "git",
-    "url": "https://github.com/startino/better-auth-oidc"
+    "url": "git+https://github.com/startino/better-auth-oidc.git"
   },
   "publishConfig": {
     "access": "public"
