@@ -205,7 +205,7 @@ export const registerSSOProvider = <O extends SSOOptions>(options: O) => {
 				});
 			}
 
-			if (ctx.body.organizationId && ctx.context.hasPlugin("organization")) {
+			if (ctx.body.organizationId && (ctx.context as any).hasPlugin?.("organization")) {
 				const organization = await ctx.context.adapter.findOne({
 					model: "member",
 					where: [
