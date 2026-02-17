@@ -1,11 +1,18 @@
 {
-  "name": "better-auth-oidc",
-  "version": "0.1.0",
+  "name": "@startino/better-auth-oidc",
+  "version": "0.1.1",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
-  "description": "OIDC-only SSO plugin for Better Auth — no Node.js APIs required",
+  "description": "OIDC-only SSO plugin for Better Auth with no Node.js API dependencies",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/startino/better-auth-oidc"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "sso",
     "auth",
