@@ -483,7 +483,7 @@ export const signInSSO = (options?: SSOOptions) => {
 			}
 			domain = body.domain || email?.split("@")[1];
 			let orgId = "";
-			if (organizationSlug) {
+			if (organizationSlug && (ctx.context as any).hasPlugin?.("organization")) {
 				orgId = await ctx.context.adapter
 					.findOne<{ id: string }>({
 						model: "organization",

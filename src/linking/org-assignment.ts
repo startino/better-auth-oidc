@@ -40,7 +40,7 @@ export async function assignOrganizationFromProvider(
 		return;
 	}
 
-	if (!ctx.context.hasPlugin("organization")) {
+	if (!(ctx.context as any).hasPlugin?.("organization")) {
 		return;
 	}
 
@@ -102,7 +102,7 @@ export async function assignOrganizationByDomain(
 		return;
 	}
 
-	if (!ctx.context.hasPlugin("organization")) {
+	if (!(ctx.context as any).hasPlugin?.("organization")) {
 		return;
 	}
 

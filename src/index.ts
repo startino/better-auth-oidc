@@ -124,7 +124,7 @@ export function oidcSso<O extends SSOOptions>(
 							return;
 						}
 
-						if (!ctx.context.hasPlugin("organization")) {
+						if (!(ctx.context as any).hasPlugin?.("organization")) {
 							return;
 						}
 

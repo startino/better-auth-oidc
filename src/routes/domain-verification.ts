@@ -96,7 +96,7 @@ export const requestDomainVerification = (options: SSOOptions) => {
 
 			const userId = ctx.context.session.user.id;
 			let isOrgMember = true;
-			if (provider.organizationId) {
+			if (provider.organizationId && (ctx.context as any).hasPlugin?.("organization")) {
 				const membershipsCount = await ctx.context.adapter.count({
 					model: "member",
 					where: [
@@ -213,7 +213,7 @@ export const verifyDomain = (options: SSOOptions) => {
 
 			const userId = ctx.context.session.user.id;
 			let isOrgMember = true;
-			if (provider.organizationId) {
+			if (provider.organizationId && (ctx.context as any).hasPlugin?.("organization")) {
 				const membershipsCount = await ctx.context.adapter.count({
 					model: "member",
 					where: [

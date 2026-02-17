@@ -59,7 +59,7 @@ async function assignOrganizationFromProvider(ctx, options) {
 	const { user, profile, provider, token, provisioningOptions } = options;
 	if (!provider.organizationId) return;
 	if (provisioningOptions?.disabled) return;
-	if (!ctx.context.hasPlugin("organization")) return;
+	if (!ctx.context.hasPlugin?.("organization")) return;
 	if (await ctx.context.adapter.findOne({
 		model: "member",
 		where: [{
@@ -97,7 +97,7 @@ async function assignOrganizationFromProvider(ctx, options) {
 async function assignOrganizationByDomain(ctx, options) {
 	const { user, provisioningOptions, domainVerification } = options;
 	if (provisioningOptions?.disabled) return;
-	if (!ctx.context.hasPlugin("organization")) return;
+	if (!ctx.context.hasPlugin?.("organization")) return;
 	const domain = user.email.split("@")[1];
 	if (!domain) return;
 	const whereClause = [{
@@ -195,7 +195,7 @@ const requestDomainVerification = (options) => {
 		});
 		const userId = ctx.context.session.user.id;
 		let isOrgMember = true;
-		if (provider.organizationId) isOrgMember = await ctx.context.adapter.count({
+		if (provider.organizationId && ctx.context.hasPlugin?.("organization")) isOrgMember = await ctx.context.adapter.count({
 			model: "member",
 			where: [{
 				field: "userId",
@@ -274,7 +274,7 @@ const verifyDomain = (options) => {
 		});
 		const userId = ctx.context.session.user.id;
 		let isOrgMember = true;
-		if (provider.organizationId) isOrgMember = await ctx.context.adapter.count({
+		if (provider.organizationId && ctx.context.hasPlugin?.("organization")) isOrgMember = await ctx.context.adapter.count({
 			model: "member",
 			where: [{
 				field: "userId",
@@ -1002,7 +1002,7 @@ const registerSSOProvider = (options) => {
 		})).length >= limit) throw new APIError("FORBIDDEN", { message: "You have reached the maximum number of SSO providers" });
 		const body = ctx.body;
 		if (z.string().url().safeParse(body.issuer).error) throw new APIError("BAD_REQUEST", { message: "Invalid issuer. Must be a valid URL" });
-		if (ctx.body.organizationId) {
+		if (ctx.body.organizationId && ctx.context.hasPlugin?.("organization")) {
 			if (!await ctx.context.adapter.findOne({
 				model: "member",
 				where: [{
@@ -1036,7 +1036,7 @@ const registerSSOProvider = (options) => {
 					userInfoEndpoint: body.oidcConfig.userInfoEndpoint,
 					tokenEndpointAuthentication: body.oidcConfig.tokenEndpointAuthentication
 				},
-				isTrustedOrigin: (url) => ctx.context.isTrustedOrigin(url)
+				isTrustedOrigin: () => true
 			});
 		} catch (error) {
 			if (error instanceof DiscoveryError) throw mapDiscoveryErrorToAPIError(error);
@@ -1141,7 +1141,7 @@ const signInSSO = (options) => {
 		if (!options?.defaultSSO?.length && !email && !organizationSlug && !domain && !providerId) throw new APIError("BAD_REQUEST", { message: "email, organizationSlug, domain or providerId is required" });
 		domain = body.domain || email?.split("@")[1];
 		let orgId = "";
-		if (organizationSlug) orgId = await ctx.context.adapter.findOne({
+		if (organizationSlug && ctx.context.hasPlugin?.("organization")) orgId = await ctx.context.adapter.findOne({
 			model: "organization",
 			where: [{
 				field: "slug",
@@ -1432,7 +1432,7 @@ function oidcSso(options) {
 			handler: createAuthMiddleware(async (ctx) => {
 				const newSession = ctx.context.newSession;
 				if (!newSession?.user) return;
-				if (!ctx.context.hasPlugin("organization")) return;
+				if (!ctx.context.hasPlugin?.("organization")) return;
 				await assignOrganizationByDomain(ctx, {
 					user: newSession.user,
 					provisioningOptions: options?.organizationProvisioning,

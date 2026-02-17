@@ -1,8 +1,8 @@
 import * as z$1 from "zod/v4";
 import z from "zod/v4";
-import * as better_auth9 from "better-auth";
+import * as better_auth0 from "better-auth";
 import { Awaitable, OAuth2Tokens, User } from "better-auth";
-import * as better_call6 from "better-call";
+import * as better_call0 from "better-call";
 
 //#region src/types.d.ts
 interface OIDCMapping {
@@ -170,7 +170,7 @@ interface SSOOptions {
 }
 //#endregion
 //#region src/routes/domain-verification.d.ts
-declare const requestDomainVerification: (options: SSOOptions) => better_call6.StrictEndpoint<"/sso/request-domain-verification", {
+declare const requestDomainVerification: (options: SSOOptions) => better_call0.StrictEndpoint<"/sso/request-domain-verification", {
   method: "POST";
   body: z$1.ZodObject<{
     providerId: z$1.ZodString;
@@ -192,7 +192,7 @@ declare const requestDomainVerification: (options: SSOOptions) => better_call6.S
       };
     };
   };
-  use: ((inputContext: better_auth9.MiddlewareInputContext<better_auth9.MiddlewareOptions>) => Promise<{
+  use: ((inputContext: better_auth0.MiddlewareInputContext<better_auth0.MiddlewareOptions>) => Promise<{
     session: {
       session: Record<string, any> & {
         id: string;
@@ -218,7 +218,7 @@ declare const requestDomainVerification: (options: SSOOptions) => better_call6.S
 }, {
   domainVerificationToken: string;
 }>;
-declare const verifyDomain: (options: SSOOptions) => better_call6.StrictEndpoint<"/sso/verify-domain", {
+declare const verifyDomain: (options: SSOOptions) => better_call0.StrictEndpoint<"/sso/verify-domain", {
   method: "POST";
   body: z$1.ZodObject<{
     providerId: z$1.ZodString;
@@ -243,7 +243,7 @@ declare const verifyDomain: (options: SSOOptions) => better_call6.StrictEndpoint
       };
     };
   };
-  use: ((inputContext: better_auth9.MiddlewareInputContext<better_auth9.MiddlewareOptions>) => Promise<{
+  use: ((inputContext: better_auth0.MiddlewareInputContext<better_auth0.MiddlewareOptions>) => Promise<{
     session: {
       session: Record<string, any> & {
         id: string;
@@ -270,9 +270,9 @@ declare const verifyDomain: (options: SSOOptions) => better_call6.StrictEndpoint
 //# sourceMappingURL=domain-verification.d.ts.map
 //#endregion
 //#region src/routes/providers.d.ts
-declare const listSSOProviders: () => better_call6.StrictEndpoint<"/sso/providers", {
+declare const listSSOProviders: () => better_call0.StrictEndpoint<"/sso/providers", {
   method: "GET";
-  use: ((inputContext: better_auth9.MiddlewareInputContext<better_auth9.MiddlewareOptions>) => Promise<{
+  use: ((inputContext: better_auth0.MiddlewareInputContext<better_auth0.MiddlewareOptions>) => Promise<{
     session: {
       session: Record<string, any> & {
         id: string;
@@ -328,9 +328,9 @@ declare const listSSOProviders: () => better_call6.StrictEndpoint<"/sso/provider
     } | undefined;
   }[];
 }>;
-declare const getSSOProvider: () => better_call6.StrictEndpoint<"/sso/get-provider", {
+declare const getSSOProvider: () => better_call0.StrictEndpoint<"/sso/get-provider", {
   method: "GET";
-  use: ((inputContext: better_auth9.MiddlewareInputContext<better_auth9.MiddlewareOptions>) => Promise<{
+  use: ((inputContext: better_auth0.MiddlewareInputContext<better_auth0.MiddlewareOptions>) => Promise<{
     session: {
       session: Record<string, any> & {
         id: string;
@@ -393,9 +393,9 @@ declare const getSSOProvider: () => better_call6.StrictEndpoint<"/sso/get-provid
     tokenEndpointAuthentication: "client_secret_post" | "client_secret_basic" | undefined;
   } | undefined;
 }>;
-declare const updateSSOProvider: (options: SSOOptions) => better_call6.StrictEndpoint<"/sso/update-provider", {
+declare const updateSSOProvider: (options: SSOOptions) => better_call0.StrictEndpoint<"/sso/update-provider", {
   method: "POST";
-  use: ((inputContext: better_auth9.MiddlewareInputContext<better_auth9.MiddlewareOptions>) => Promise<{
+  use: ((inputContext: better_auth0.MiddlewareInputContext<better_auth0.MiddlewareOptions>) => Promise<{
     session: {
       session: Record<string, any> & {
         id: string;
@@ -484,9 +484,9 @@ declare const updateSSOProvider: (options: SSOOptions) => better_call6.StrictEnd
     tokenEndpointAuthentication: "client_secret_post" | "client_secret_basic" | undefined;
   } | undefined;
 }>;
-declare const deleteSSOProvider: () => better_call6.StrictEndpoint<"/sso/delete-provider", {
+declare const deleteSSOProvider: () => better_call0.StrictEndpoint<"/sso/delete-provider", {
   method: "POST";
-  use: ((inputContext: better_auth9.MiddlewareInputContext<better_auth9.MiddlewareOptions>) => Promise<{
+  use: ((inputContext: better_auth0.MiddlewareInputContext<better_auth0.MiddlewareOptions>) => Promise<{
     session: {
       session: Record<string, any> & {
         id: string;
@@ -536,7 +536,7 @@ declare const deleteSSOProvider: () => better_call6.StrictEndpoint<"/sso/delete-
 //# sourceMappingURL=providers.d.ts.map
 //#endregion
 //#region src/routes/sso.d.ts
-declare const registerSSOProvider: <O extends SSOOptions>(options: O) => better_call6.StrictEndpoint<"/sso/register", {
+declare const registerSSOProvider: <O extends SSOOptions>(options: O) => better_call0.StrictEndpoint<"/sso/register", {
   method: "POST";
   body: z.ZodObject<{
     providerId: z.ZodString;
@@ -569,7 +569,7 @@ declare const registerSSOProvider: <O extends SSOOptions>(options: O) => better_
     organizationId: z.ZodOptional<z.ZodString>;
     overrideUserInfo: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
   }, z.core.$strip>;
-  use: ((inputContext: better_auth9.MiddlewareInputContext<better_auth9.MiddlewareOptions>) => Promise<{
+  use: ((inputContext: better_auth0.MiddlewareInputContext<better_auth0.MiddlewareOptions>) => Promise<{
     session: {
       session: Record<string, any> & {
         id: string;
@@ -616,7 +616,7 @@ declare const registerSSOProvider: <O extends SSOOptions>(options: O) => better_
   redirectURI: string;
   oidcConfig: OIDCConfig | null;
 } & Omit<SSOProvider<O>, "oidcConfig">>;
-declare const signInSSO: (options?: SSOOptions) => better_call6.StrictEndpoint<"/sign-in/sso", {
+declare const signInSSO: (options?: SSOOptions) => better_call0.StrictEndpoint<"/sign-in/sso", {
   method: "POST";
   body: z.ZodObject<{
     email: z.ZodOptional<z.ZodString>;
@@ -646,7 +646,7 @@ declare const signInSSO: (options?: SSOOptions) => better_call6.StrictEndpoint<"
   url: string;
   redirect: boolean;
 }>;
-declare const callbackSSO: (options?: SSOOptions) => better_call6.StrictEndpoint<"/sso/callback/:providerId", {
+declare const callbackSSO: (options?: SSOOptions) => better_call0.StrictEndpoint<"/sso/callback/:providerId", {
   method: "GET";
   query: z.ZodObject<{
     code: z.ZodOptional<z.ZodString>;
