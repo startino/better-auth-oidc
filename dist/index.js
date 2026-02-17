@@ -963,7 +963,7 @@ const ssoProviderBodySchema = z.object({
 		jwksEndpoint: z.string({}).meta({ description: "The JWKS endpoint" }).optional(),
 		discoveryEndpoint: z.string().optional(),
 		skipDiscovery: z.boolean().meta({ description: "Skip OIDC discovery during registration. When true, you must provide authorizationEndpoint, tokenEndpoint, and jwksEndpoint manually." }).optional(),
-		scopes: z.array(z.string(), {}).meta({ description: "The scopes to request. Defaults to ['openid', 'email', 'profile', 'offline_access']" }).optional(),
+		scopes: z.array(z.string(), {}).meta({ description: "The scopes to request. Defaults to ['openid', 'email', 'profile']" }).optional(),
 		pkce: z.boolean({}).meta({ description: "Whether to use PKCE for the authorization flow" }).default(true).optional(),
 		mapping: z.object({
 			id: z.string({}).meta({ description: "Field mapping for user ID (defaults to 'sub')" }),
@@ -1213,8 +1213,7 @@ const signInSSO = (options) => {
 			scopes: ctx.body.scopes || provider.oidcConfig.scopes || [
 				"openid",
 				"email",
-				"profile",
-				"offline_access"
+				"profile"
 			],
 			loginHint: ctx.body.loginHint || email,
 			authorizationEndpoint: finalAuthUrl
@@ -1289,8 +1288,7 @@ const callbackSSO = (options) => {
 			scopes: [
 				"openid",
 				"email",
-				"profile",
-				"offline_access"
+				"profile"
 			],
 			...config
 		};

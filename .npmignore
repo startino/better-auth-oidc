@@ -1,0 +1,8 @@
+src/
+*.tsbuildinfo
+.DS_Store
+tsconfig.json
+tsdown.config.ts
+vitest.config.ts
+bun.lock
+.npmrc

@@ -93,7 +93,7 @@ const ssoProviderBodySchema = z.object({
 				.array(z.string(), {})
 				.meta({
 					description:
-						"The scopes to request. Defaults to ['openid', 'email', 'profile', 'offline_access']",
+						"The scopes to request. Defaults to ['openid', 'email', 'profile']",
 				})
 				.optional(),
 			pkce: z
@@ -636,7 +636,6 @@ export const signInSSO = (options?: SSOOptions) => {
 						"openid",
 						"email",
 						"profile",
-						"offline_access",
 					],
 				loginHint: ctx.body.loginHint || email,
 				authorizationEndpoint: finalAuthUrl,
@@ -780,7 +779,7 @@ export const callbackSSO = (options?: SSOOptions) => {
 					tokenEndpointAuthentication:
 						discovery.data.token_endpoint_auth_method,
 					userInfoEndpoint: discovery.data.userinfo_endpoint,
-					scopes: ["openid", "email", "profile", "offline_access"],
+					scopes: ["openid", "email", "profile"],
 					...config,
 				};
 			}
