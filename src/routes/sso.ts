@@ -990,6 +990,23 @@ export const callbackSSO = (options?: SSOOptions) => {
 				session,
 				user,
 			});
+
+			// Generate one-time token for cross-domain session transfer
+			const ottToken = generateRandomString(32);
+			await ctx.context.adapter.create<Verification>({
+				model: "verification",
+				data: {
+					identifier: `sso-ott:${ottToken}`,
+					value: JSON.stringify({
+						sessionToken: session.token,
+						userId: user.id,
+					}),
+					createdAt: new Date(),
+					updatedAt: new Date(),
+					expiresAt: new Date(Date.now() + 60 * 1000), // 60 seconds
+				},
+			});
+
 			let toRedirectTo: string;
 			try {
 				const url = linked.isRegister ? newUserURL || callbackURL : callbackURL;
@@ -999,7 +1016,109 @@ export const callbackSSO = (options?: SSOOptions) => {
 					? newUserURL || callbackURL
 					: callbackURL;
 			}
+			const ottSeparator = toRedirectTo.includes("?") ? "&" : "?";
+			toRedirectTo = `${toRedirectTo}${ottSeparator}ott=${ottToken}`;
 			throw ctx.redirect(toRedirectTo);
+		},
+	);
+};
+
+export const verifyOtt = () => {
+	return createAuthEndpoint(
+		"/sso/verify-ott",
+		{
+			method: "GET",
+			query: z.object({
+				token: z.string(),
+			}),
+			metadata: {
+				openapi: {
+					operationId: "verifyOtt",
+					summary: "Verify a one-time token from SSO callback",
+					description:
+						"Exchanges a one-time token for a session cookie on the calling domain. Used for cross-domain session transfer after SSO callback.",
+					responses: {
+						"200": {
+							description: "Session cookie set successfully",
+						},
+					},
+				},
+			},
+		},
+		async (ctx) => {
+			const { token } = ctx.query;
+
+			const identifier = `sso-ott:${token}`;
+			const verification = await ctx.context.adapter.findOne<Verification>({
+				model: "verification",
+				where: [{ field: "identifier", value: identifier }],
+			});
+
+			if (!verification) {
+				throw new APIError("BAD_REQUEST", {
+					message: "Invalid or expired token",
+				});
+			}
+
+			if (new Date(verification.expiresAt) < new Date()) {
+				await ctx.context.adapter.delete({
+					model: "verification",
+					where: [{ field: "identifier", value: identifier }],
+				});
+				throw new APIError("BAD_REQUEST", {
+					message: "Token has expired",
+				});
+			}
+
+			// Delete immediately (one-time use)
+			await ctx.context.adapter.delete({
+				model: "verification",
+				where: [{ field: "identifier", value: identifier }],
+			});
+
+			const data = JSON.parse(verification.value) as {
+				sessionToken: string;
+				userId: string;
+			};
+
+			const session = await ctx.context.adapter.findOne<{
+				id: string;
+				token: string;
+				userId: string;
+				expiresAt: Date;
+			}>({
+				model: "session",
+				where: [{ field: "token", value: data.sessionToken }],
+			});
+
+			if (!session) {
+				throw new APIError("BAD_REQUEST", {
+					message: "Session not found",
+				});
+			}
+
+			const user = await ctx.context.adapter.findOne<{
+				id: string;
+				email: string;
+				name: string;
+				image?: string;
+				emailVerified: boolean;
+				createdAt: Date;
+				updatedAt: Date;
+			}>({
+				model: "user",
+				where: [{ field: "id", value: data.userId }],
+			});
+
+			if (!user) {
+				throw new APIError("BAD_REQUEST", {
+					message: "User not found",
+				});
+			}
+
+			await setSessionCookie(ctx, { session, user });
+
+			return ctx.json({ success: true });
 		},
 	);
 };

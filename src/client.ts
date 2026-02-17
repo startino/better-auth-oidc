@@ -24,6 +24,7 @@ export const oidcSsoClient = <CO extends OIDCSSOClientOptions>(
 		pathMethods: {
 			"/sso/providers": "GET",
 			"/sso/get-provider": "GET",
+			"/sso/verify-ott": "GET",
 		},
 	} satisfies BetterAuthClientPlugin;
 };

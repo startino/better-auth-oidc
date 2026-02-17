@@ -15,6 +15,7 @@ import {
 	callbackSSO,
 	registerSSOProvider,
 	signInSSO,
+	verifyOtt,
 } from "./routes/sso";
 
 import type { OIDCConfig, SSOOptions, SSOProvider } from "./types";
@@ -49,6 +50,7 @@ type OIDCSSOEndpoints<O extends SSOOptions> = {
 	registerSSOProvider: ReturnType<typeof registerSSOProvider<O>>;
 	signInSSO: ReturnType<typeof signInSSO>;
 	callbackSSO: ReturnType<typeof callbackSSO>;
+	verifyOtt: ReturnType<typeof verifyOtt>;
 	listSSOProviders: ReturnType<typeof listSSOProviders>;
 	getSSOProvider: ReturnType<typeof getSSOProvider>;
 	updateSSOProvider: ReturnType<typeof updateSSOProvider>;
@@ -91,6 +93,7 @@ export function oidcSso<O extends SSOOptions>(
 		registerSSOProvider: registerSSOProvider(optionsWithStore),
 		signInSSO: signInSSO(optionsWithStore),
 		callbackSSO: callbackSSO(optionsWithStore),
+		verifyOtt: verifyOtt(),
 		listSSOProviders: listSSOProviders(),
 		getSSOProvider: getSSOProvider(),
 		updateSSOProvider: updateSSOProvider(optionsWithStore),
