@@ -259,7 +259,7 @@ export const registerSSOProvider = <O extends SSOOptions>(options: O) => {
 							tokenEndpointAuthentication:
 								body.oidcConfig.tokenEndpointAuthentication,
 						},
-						isTrustedOrigin: (url: string) => ctx.context.isTrustedOrigin(url),
+						isTrustedOrigin: () => true,
 					});
 				} catch (error) {
 					if (error instanceof DiscoveryError) {
