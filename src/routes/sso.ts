@@ -694,7 +694,7 @@ export const callbackSSO = (options?: SSOOptions) => {
 				throw ctx.redirect(
 					`${
 						errorURL || callbackURL
-					}?error=${error}&error_description=${error_description}`,
+					}?error=${encodeURIComponent(error || "unknown")}&error_description=${encodeURIComponent(error_description || "")}`,
 				);
 			}
 			let provider: SSOProvider<SSOOptions> | null = null;
@@ -742,7 +742,7 @@ export const callbackSSO = (options?: SSOOptions) => {
 				throw ctx.redirect(
 					`${
 						errorURL || callbackURL
-					}?error=invalid_provider&error_description=provider not found`,
+					}?error=invalid_provider&error_description=provider_not_found`,
 				);
 			}
 
@@ -761,7 +761,7 @@ export const callbackSSO = (options?: SSOOptions) => {
 				throw ctx.redirect(
 					`${
 						errorURL || callbackURL
-					}?error=invalid_provider&error_description=provider not found`,
+					}?error=invalid_provider&error_description=provider_not_found`,
 				);
 			}
 
@@ -810,7 +810,7 @@ export const callbackSSO = (options?: SSOOptions) => {
 					throw ctx.redirect(
 						`${
 							errorURL || callbackURL
-						}?error=invalid_provider&error_description=${e.message}`,
+						}?error=invalid_provider&error_description=${encodeURIComponent(e.message)}`,
 					);
 				}
 				return null;
@@ -905,9 +905,9 @@ export const callbackSSO = (options?: SSOOptions) => {
 					throw ctx.redirect(
 						`${
 							errorURL || callbackURL
-						}?error=invalid_provider&error_description=${
-							userInfoResponse.error.message
-						}`,
+						}?error=invalid_provider&error_description=${encodeURIComponent(
+							userInfoResponse.error.message,
+						)}`,
 					);
 				}
 				userInfo = userInfoResponse.data;
@@ -951,33 +951,40 @@ export const callbackSSO = (options?: SSOOptions) => {
 				isTrustedProvider,
 			});
 			if (linked.error) {
-				throw ctx.redirect(`${errorURL || callbackURL}?error=${linked.error}`);
+				const safeError = linked.error.replace(/\s+/g, "_");
+				throw ctx.redirect(
+					`${errorURL || callbackURL}?error=${encodeURIComponent(safeError)}`,
+				);
 			}
 			const { session, user } = linked.data!;
 
-			if (options?.provisionUser && linked.isRegister) {
-				await options.provisionUser({
-					user,
-					userInfo,
-					token: tokenResponse,
-					provider,
-				});
-			}
+			try {
+				if (options?.provisionUser && linked.isRegister) {
+					await options.provisionUser({
+						user,
+						userInfo,
+						token: tokenResponse,
+						provider,
+					});
+				}
 
-			await assignOrganizationFromProvider(ctx as any, {
-				user,
-				profile: {
-					providerType: "oidc",
-					providerId: provider.providerId,
-					accountId: userInfo.id,
-					email: userInfo.email,
-					emailVerified: Boolean(userInfo.emailVerified),
-					rawAttributes: userInfo,
-				},
-				provider,
-				token: tokenResponse,
-				provisioningOptions: options?.organizationProvisioning,
-			});
+				await assignOrganizationFromProvider(ctx as any, {
+					user,
+					profile: {
+						providerType: "oidc",
+						providerId: provider.providerId,
+						accountId: userInfo.id,
+						email: userInfo.email,
+						emailVerified: Boolean(userInfo.emailVerified),
+						rawAttributes: userInfo,
+					},
+					provider,
+					token: tokenResponse,
+					provisioningOptions: options?.organizationProvisioning,
+				});
+			} catch (e) {
+				ctx.context.logger.error("SSO post-linking error", e);
+			}
 
 			await setSessionCookie(ctx, {
 				session,
