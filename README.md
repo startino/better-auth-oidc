@@ -194,6 +194,72 @@ if (ott) {
 
 The key requirement: the `verify-ott` call must go through your app's proxy to the auth server so the `Set-Cookie` header lands on your app's domain.
 
+### Avoiding `ott` param conflicts
+
+Some auth libraries (notably `convex-better-auth-svelte`) auto-intercept `?ott=` in the URL and try to verify it through Better Auth's built-in cross-domain plugin. This is a different endpoint and token format than this plugin's `/sso/verify-ott`. If the cross-domain plugin isn't installed, this causes an unhandled error.
+
+**Fix:** Strip or rename the `ott` param server-side before it reaches the client. In SvelteKit, use a `+page.server.ts` on your callback page:
+
+```ts
+// +page.server.ts on your SSO callback page
+import { redirect } from "@sveltejs/kit";
+
+export const load = async ({ url, params }) => {
+  const ott = url.searchParams.get("ott");
+  if (!ott) return {};
+
+  // Rename ott to sso_ott so other libraries don't intercept it.
+  // Your client-side code reads sso_ott instead.
+  throw redirect(302, `/${params.org}/signin?sso_callback=true&sso_ott=${encodeURIComponent(ott)}`);
+};
+```
+
+Then read `sso_ott` in your client-side callback handler instead of `ott`.
+
+If your callback page doesn't need OTT verification at all (e.g. the user is already authenticated and you're only re-verifying their identity), strip the `ott` entirely:
+
+```ts
+// +page.server.ts — just drop the ott param
+import { redirect } from "@sveltejs/kit";
+
+export const load = async ({ url, params }) => {
+  if (url.searchParams.get("callback") === "true" && url.searchParams.get("ott")) {
+    throw redirect(302, `/${params.org}/sso-verify?callback=true`);
+  }
+  return {};
+};
+```
+
+### Configuring error redirects for cross-domain setups
+
+When the auth server runs on a different domain than your app, Better Auth's OAuth error handling (expired state, state mismatch, PKCE failures) redirects to `${baseURL}/error`. If `baseURL` points to the auth server, users see a raw error page with no UI.
+
+Set `onAPIError.errorURL` in your Better Auth config to redirect errors to your app instead:
+
+```ts
+const auth = betterAuth({
+  baseURL: process.env.AUTH_SERVER_URL,
+  onAPIError: {
+    errorURL: process.env.APP_URL, // e.g. "https://myapp.com"
+  },
+  plugins: [oidcSso()],
+});
+```
+
+Then handle the `?error=` query param on your app:
+
+```ts
+// In your root layout or error handler
+const error = new URL(window.location.href).searchParams.get("error");
+if (error) {
+  // Show a user-friendly message. Common errors:
+  // - please_restart_the_process (expired OAuth state)
+  // - state_mismatch (state verification failed)
+  // - invalid_state (corrupted state data)
+  showError("Sign-in session expired. Please try again.");
+}
+```
+
 ## Configuration options
 
 ### `SSOOptions`
