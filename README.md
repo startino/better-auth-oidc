@@ -97,37 +97,40 @@ await client.signIn.sso({
 Here is what happens during an SSO sign-in:
 
 ```
-┌──────────┐     ┌──────────────┐     ┌─────────┐     ┌─────────┐
-│  Client   │     │  Auth Server  │     │   IdP    │     │   App   │
-└────┬─────┘     └──────┬───────┘     └────┬────┘     └────┬────┘
-     │  POST /sign-in/sso│                  │               │
-     │──────────────────>│                  │               │
-     │                   │  302 → authorize │               │
-     │                   │─────────────────>│               │
-     │                   │                  │               │
-     │                   │   User logs in   │               │
-     │                   │                  │               │
-     │                   │  GET /sso/callback│               │
-     │                   │<─────────────────│               │
-     │                   │                  │               │
-     │                   │  Exchange code   │               │
-     │                   │  for tokens      │               │
-     │                   │─────────────────>│               │
-     │                   │<─────────────────│               │
-     │                   │                  │               │
-     │                   │  Create/link user │              │
-     │                   │  Create session   │              │
-     │                   │  Generate OTT     │              │
-     │                   │                  │               │
-     │                   │  302 → callbackURL?ott=TOKEN     │
-     │                   │─────────────────────────────────>│
-     │                   │                  │               │
-     │                   │     GET /sso/verify-ott?token=…  │
-     │                   │<─────────────────────────────────│
-     │                   │                  │               │
-     │                   │  Set session cookie on app domain│
-     │                   │─────────────────────────────────>│
-     └                   └                  └               └
+┌────────┐            ┌─────────────┐            ┌─────┐            ┌─────┐
+│ Client │            │ Auth Server │            │ IdP │            │ App │
+└───┬────┘            └──────┬──────┘            └──┬──┘            └──┬──┘
+    │                        │                      │                  │
+    │  POST /sign-in/sso     │                      │                  │
+    │───────────────────────>│                      │                  │
+    │                        │                      │                  │
+    │                        │  302 → authorize     │                  │
+    │                        │─────────────────────>│                  │
+    │                        │                      │                  │
+    │                        │  User logs in        │                  │
+    │                        │                      │                  │
+    │                        │  GET /sso/callback   │                  │
+    │                        │<─────────────────────│                  │
+    │                        │                      │                  │
+    │                        │  Exchange code       │                  │
+    │                        │  for tokens          │                  │
+    │                        │─────────────────────>│                  │
+    │                        │<─────────────────────│                  │
+    │                        │                      │                  │
+    │                        │  Create/link user    │                  │
+    │                        │  Create session      │                  │
+    │                        │  Generate OTT        │                  │
+    │                        │                      │                  │
+    │                        │       302 → callbackURL?ott=TOKEN       │
+    │                        │────────────────────────────────────────>│
+    │                        │                      │                  │
+    │                        │       GET /sso/verify-ott?token=…       │
+    │                        │<────────────────────────────────────────│
+    │                        │                      │                  │
+    │                        │    Set session cookie on app domain     │
+    │                        │────────────────────────────────────────>│
+    │                        │                      │                  │
+    ▼                        ▼                      ▼                  ▼
 ```
 
 1. **Sign-in request.** The client calls `POST /sign-in/sso` with an email, domain, or provider ID. The plugin finds the matching SSO provider and builds the OIDC authorization URL.
