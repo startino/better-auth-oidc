@@ -560,4 +560,4 @@ This package is an OIDC-only extraction of [`@better-auth/sso`](https://github.c
 
 ## License
 
-MIT
+Apache-2.0
